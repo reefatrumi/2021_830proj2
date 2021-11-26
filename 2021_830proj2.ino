@@ -1,9 +1,9 @@
 #include <IRremote.h>
 
+const int enA = 9;
+const int in1 = 8;
+const int in2 = 7;
 const int irPin = 5;
-const int enA = 6;
-const int in1 = 7;
-const int in2 = 8;
 
 IRrecv irrecv(irPin);     // create instance of 'irrecv'
 decode_results results;      // create instance of 'decode_results'

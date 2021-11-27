@@ -3,8 +3,9 @@
 const int enA = 9;
 const int in1 = 8;
 const int in2 = 7;
-const int irPin = 5;
+const int irPin = 12;
 
+int state = 3;
 IRrecv irrecv(irPin);     // create instance of 'irrecv'
 decode_results results;      // create instance of 'decode_results'
 
@@ -16,42 +17,59 @@ void setup() {
   digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
   irrecv.enableIRIn();
-  Serial.begin(9600);
+  //Serial.begin(9600);
+}
+void loop() {
+  readRemote();
+  if(state == 1){
+    forward();
+  }
+  if(state == 2){
+    rotate();
+  }
+  if(state == 3){
+    stopRobot();
+  }
+  Serial.println(state); 
 }
 void readRemote() {
   if (irrecv.decode(&results)) {
     switch (results.value) {
       case 0xFF629D: //Keypad button "VOL+"
-      forward();
+      state = 1;
+      Serial.println("moving forward");
     }
     switch (results.value) {
       case 0xFFA857: //Keypad button "VOL-"
-      rotate();
+      state = 2;
+      Serial.println("rotating");
     }
     switch (results.value) {
       case 0xFF02FD: //Keypad button "PAUSE"
-      stopRobot();
+      state = 3;
+      Serial.println("stopped");
     }
     irrecv.resume();
   }
 }
 
-void loop() {
-  readRemote();
-}
+
 
 void stopRobot() {
   analogWrite(enA, 0);
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  
 }
 
 void forward() {
   digitalWrite(in1, HIGH);
   digitalWrite(in2, LOW);
-  analogWrite(enA, 200);
+  analogWrite(enA, 255);
 }
 
 void rotate() {
   digitalWrite(in1, LOW);
   digitalWrite(in2, HIGH);
-  analogWrite(enA, 200);
+  analogWrite(enA, 255);
 }

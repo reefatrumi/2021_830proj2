@@ -12,17 +12,16 @@ const int servoPin = 6;
 
 Stepper stepper(2048, in4, in2, in3, in1);
 Servo servo;
-IRrecv irrecv(irPin);     // create instance of 'irrecv'
-decode_results results;      // create instance of 'decode_results'
-
+IRrecv irrecv(irPin);     
+decode_results results;      
 int cycle = 2048;
 
 void setup() {
   pinMode(irPin, INPUT);
   irrecv.enableIRIn();
-  stepper.setSpeed(5);
+  stepper.setSpeed(10);
   servo.attach(6);
-  servo.write(90);
+  servo.write(88);
   //Serial.begin(9600);
 }
 void loop() {
@@ -35,24 +34,28 @@ void readRemote() {
       case 0xFF02FD: //Keypad button "PAUSE"
         auton();
     }
+    switch (results.value) {
+      case 0xFFA25D: //Keypad button "PAUSE"
+        stopRobot();
+    }
     irrecv.resume();
   }
 }
 
-void auton(){
-  stepper.step(-4.5*cycle);
+void auton() {
+  stepper.step(-1.6 * cycle);
   right();
-  stepper.step(-0.2*cycle);
+  stepper.step(-1 * cycle);
   center();
-  stepper.step(-4.3*cycle);
+  stepper.step(-0.6 * cycle);
   right();
-  stepper.step(-0.2*cycle);
+  stepper.step(-1.1 * cycle);
   center();
-  stepper.step(-4.3*cycle);
+  stepper.step(-0.7 * cycle);
   right();
-  stepper.step(-0.2*cycle);
-  center();  
-  stepper.step(-4.3*cycle);
+  stepper.step(-1.2 * cycle);
+  center();
+  stepper.step(-1.1 * cycle);
   stopRobot();
 }
 
@@ -70,6 +73,6 @@ void right() {
   servo.write(70);
 }
 
-void center(){
+void center() {
   servo.write(90);
 }

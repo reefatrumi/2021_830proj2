@@ -2,10 +2,8 @@
 #include <Stepper.h>
 #include <Servo.h>
 
-const int irPin = 4;
-const int servoPin = 6;
-
-
+#define irPin 4
+#define servoPin 6
 #define in1  11
 #define in2  10
 #define in3  9
@@ -13,8 +11,8 @@ const int servoPin = 6;
 
 Stepper stepper(2048, in4, in2, in3, in1);
 Servo servo;
-IRrecv irrecv(irPin);     // create instance of 'irrecv'
-decode_results results;      // create instance of 'decode_results'
+IRrecv irrecv(irPin);     
+decode_results results;      
 
 int state = 1;
 int stepVal = 0;
@@ -22,10 +20,9 @@ int stepVal = 0;
 void setup() {
   pinMode(irPin, INPUT);
   irrecv.enableIRIn();
-  stepper.setSpeed(5);
+  stepper.setSpeed(10);
   servo.attach(6);
-  servo.write(90);
-  //Serial.begin(9600);
+  servo.write(88);
 }
 void loop() {
   readRemote();
@@ -40,12 +37,6 @@ void loop() {
   if (state == 3) {
     rev();
   }
-//  if (state == 4) {
-//    left;
-//  }
-//  if (state == 5) {
-//    right;
-//  }
 }
 void readRemote() {
   if (irrecv.decode(&results)) {
@@ -63,17 +54,14 @@ void readRemote() {
     }
     switch (results.value) {
       case 0xFF22DD: //Keypad button "FAST BACK"
-        //state = 4;
         left();
     }
     switch (results.value) {
       case 0xFFC23D: //Keypad button "FAST FORWARD"
-        //state = 5;
         right();
     }
     switch (results.value) {
       case 0xFF9867: //Keypad button "FAST FORWARD"
-        //state = 5;
         center();
     }
     irrecv.resume();

@@ -4,6 +4,8 @@
 
 const int irPin = 4;
 const int servoPin = 6;
+const int trig = 7;
+const int echo = 5;
 
 #define in1  11
 #define in2  10
@@ -12,23 +14,27 @@ const int servoPin = 6;
 
 Stepper stepper(2048, in4, in2, in3, in1);
 Servo servo;
-IRrecv irrecv(irPin);     // create instance of 'irrecv'
-decode_results results;      // create instance of 'decode_results'
+IRrecv irrecv(irPin);    
+decode_results results;   
 
 int cycle = 2048;
-
+double distance;
+long duration;
+int start = 0;
+int stepCounter = 0;
 void setup() {
   pinMode(irPin, INPUT);
+  pinMode(trig, OUTPUT);
+  pinMode(echo, INPUT);
   irrecv.enableIRIn();
-  stepper.setSpeed(5);
+  stepper.setSpeed(10);
   servo.attach(6);
-  servo.write(90);
-  //Serial.begin(9600);
+  servo.write(88);
 }
 void loop() {
   readRemote();
-  if (start = 1 && stepCounter < 9.3 * cycle) {
-    if (distance <= 50) {
+  if (start == 1 && stepCounter < 4.2 * cycle) {
+    if (distance <= 30) {
       stepCounter = stepCounter + 200;
       avoid();
     }
@@ -47,14 +53,26 @@ void readRemote() {
     irrecv.resume();
   }
 }
-
+void calculateDist() {
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+  duration = pulseIn(echo, HIGH);
+  distance = duration * 0.0344 / 2;
+}
 void avoid() {
-  right();
-  stepper.step(-0.2 * cycle);
   left();
-  stepper.step(-0.4 * cycle);
+  stepper.step(-0.5 * cycle);
   right();
-  stepper.step(-0.2 * cycle);
+  stepper.step(-0.5 * cycle);
+  center();
+  stepper.step(-0.5 * cycle);
+  right();
+  stepper.step(-0.5 * cycle);
+  left();
+  stepper.step(-0.5 * cycle);
   center();
 }
 

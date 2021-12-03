@@ -14,14 +14,15 @@ const int echo = 5;
 
 Stepper stepper(2048, in4, in2, in3, in1);
 Servo servo;
-IRrecv irrecv(irPin);    
-decode_results results;   
+IRrecv irrecv(irPin);
+decode_results results;
 
 int cycle = 2048;
 double distance;
 long duration;
 int start = 0;
 int stepCounter = 0;
+int toggle = 0;
 void setup() {
   pinMode(irPin, INPUT);
   pinMode(trig, OUTPUT);
@@ -30,16 +31,20 @@ void setup() {
   stepper.setSpeed(10);
   servo.attach(6);
   servo.write(88);
+  Serial.begin(9600);
 }
 void loop() {
   readRemote();
-  if (start == 1 && stepCounter < 4.2 * cycle) {
-    if (distance <= 30) {
-      stepCounter = stepCounter + 200;
+  calculateDist();
+  if (start == 1 && stepCounter < 3.7 * cycle) {
+    if (distance <= 30 && toggle != 1) {
+      stepCounter = stepCounter + 3000;
       avoid();
+      distance = 100;
+      toggle = 1;
     }
-    stepper.step(-1);
-    stepCounter++;
+    stepper.step(-10);
+    stepCounter = stepCounter + 10;
   }
   stopRobot();
 }
@@ -61,6 +66,7 @@ void calculateDist() {
   digitalWrite(trig, LOW);
   duration = pulseIn(echo, HIGH);
   distance = duration * 0.0344 / 2;
+  Serial.println(distance);
 }
 void avoid() {
   left();
@@ -74,6 +80,7 @@ void avoid() {
   left();
   stepper.step(-0.5 * cycle);
   center();
+  distance = 100;
 }
 
 void stopRobot() {
